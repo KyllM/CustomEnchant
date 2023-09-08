@@ -1,0 +1,10 @@
+name: CustomEnchant
+main: fr.kyll01.customenchant.Main
+api-version: 1.19
+author: Kyll01
+version: 1.2
+commands:
+  ce:
+    permission: enchant.autosmelt, enchant.telepathy, enchant.haste, enchant.oxygen, enchant.dolphin
+  cegui:
+      permission: customenchantgui.open

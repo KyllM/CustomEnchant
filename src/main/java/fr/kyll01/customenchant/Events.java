@@ -14,15 +14,13 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.player.PlayerFishEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerMoveEvent;
-import org.bukkit.event.player.PlayerToggleFlightEvent;
+import org.bukkit.event.player.*;
 import org.bukkit.inventory.FurnaceRecipe;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.Recipe;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
@@ -415,39 +413,33 @@ public class Events implements Listener {
 
         List<String> lore = itemMeta.getLore();
         String blockTrackLinePrefix = "§cBlockTrack: ";
-        int blockTrackCount = 0;
-        for (int i = 0; i < Objects.requireNonNull(lore).size(); i++) {
+        String breakBlocksValue = "";
+        for (int i = 0; i < lore.size(); i++) {
             String loreLine = lore.get(i);
-            if (loreLine.startsWith("§cBlockTrack ")) {
-                // Ajoute 1 au compteur de blocs cassés
-                blockTrackCount++;
-                System.out.println(blockTrackCount);
-                // Met à jour la ligne du lore avec le nouveau compteur
-                lore.set(i, blockTrackLinePrefix + blockTrackCount);
-                itemMeta.setLore(lore);
-                item.setItemMeta(itemMeta);
 
-            }
-            if (loreLine.startsWith("§cBlockTrack: ")) {
-                String blockTrackValue = loreLine.substring(blockTrackLinePrefix.length()).trim();
+            if (loreLine.startsWith(blockTrackLinePrefix) || loreLine.startsWith("§cBlockTrack")) {
 
-                System.out.println(blockTrackValue);
-
-                try {
-                    blockTrackCount = Integer.parseInt(blockTrackValue);
-                    System.out.println(blockTrackCount);
-                } catch (NumberFormatException ignored) {
+                // Met à jour la ligne du lore avec le nouveau nombre de blocs parcourus
+                int breakedBlocks;
+                if (loreLine.startsWith("§cBlockTrack: ")) {
+                    breakBlocksValue = loreLine.substring(blockTrackLinePrefix.length()).trim();
+                } else {
+                    breakBlocksValue = "b";
                 }
-
-                // Ajoute 1 au compteur de blocs cassés
-                blockTrackCount++;
-                // Met à jour la ligne du lore avec le nouveau compteur
-                lore.set(i, blockTrackLinePrefix + blockTrackCount);
+                if (breakBlocksValue != "b") {
+                    breakedBlocks = Integer.parseInt(breakBlocksValue);
+                } else {
+                    breakedBlocks = 0; // Valeur par défaut si la chaîne est vide
+                }
+                breakedBlocks = breakedBlocks + 1;
+                lore.set(i, blockTrackLinePrefix + breakedBlocks);
                 itemMeta.setLore(lore);
                 item.setItemMeta(itemMeta);
+                // Après avoir modifié le lore de l'item
+                //System.out.println(walkedBlocks);
             }
-
         }
+
     }
 
     @EventHandler
@@ -669,28 +661,16 @@ public class Events implements Listener {
                         }
                     }
                     if (Utils.hasEnchant(itemBoots, Utils.slimeboots_I)) {
-                        System.out.println("aaa");
-                        if (p.isOnGround()) {
-                            System.out.println(p.getFallDistance());
-                            if (p.getFallDistance() > 0) {
-                                if(p.getFallDistance() == 1){
-                                    reboundStrength = 5.0;
-                                }
-                                System.out.println("hhh");
-                                e.setCancelled(true); // Annule la chute pour éviter les dégâts de chute
-                                System.out.println("ggg");
-                                System.out.println(p.getFallDistance());
-                                System.out.println("bbb");
-                                e.setCancelled(true); // Annule la chute pour éviter les dégâts de chute
-                                System.out.println("ccc");
-                                Vector playerVelocity = p.getVelocity();
-                                System.out.println("ddd");
-                                playerVelocity.setY(p.getFallDistance() * reboundStrength);
-                                System.out.println("eee");
-                                p.setVelocity(playerVelocity);
-                                System.out.println("fff");
-                                reboundStrength *= 0.8; // Diminue la force de rebond à chaque chute
-                            }
+
+                        Player player = e.getPlayer();
+                        Location from = e.getFrom();
+                        Location to = e.getTo();
+
+                        if (from.getY() > to.getY() && !player.isFlying() && player.isOnGround()) {
+
+                            double fallHeight = from.getY() - to.getY();
+                            double bounceHeight = fallHeight * 0.8;
+                            player.setVelocity(player.getVelocity().setY(bounceHeight));
 
                         }
                     }
@@ -740,6 +720,106 @@ public class Events implements Listener {
     }
 
 
+    @EventHandler
+    public void onPlayerInteractEntity(PlayerInteractEntityEvent event) {
+
+        System.out.println("111");
+        Player player = event.getPlayer();
+        LivingEntity entity = (LivingEntity) event.getRightClicked();
+        ItemStack itemInHand = player.getInventory().getItemInMainHand();
+        if (Utils.hasEnchant(itemInHand, Utils.strangulation_I)) {
+            System.out.println("222");
+            freezeEntity(entity);
+        } else {
+            unfreezeEntity(entity);
+        }
+    }
+
+    public void freezeEntity(LivingEntity entity) {
+        System.out.println("333");
+
+        entity.setGravity(false);
+        entity.setAI(false);
+        // Inflige des dégâts toutes les secondes
+        PotionEffectType effect = PotionEffectType.SLOW;
+        entity.addPotionEffect(effect.createEffect(10, 255));
+        entity.damage(1.0);
+    }
+
+
+    public void unfreezeEntity(LivingEntity entity) {
+        entity.setGravity(true);
+        entity.setAI(true);
+        // Ajoute d'autres actions spécifiques à l'entité dégelée si nécessaire
+    }
+
+    @EventHandler
+    public void push(PlayerInteractEvent event) {
+        Player player = event.getPlayer();
+
+        if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) {
+            ItemStack item = player.getInventory().getItemInMainHand();
+
+            if (Utils.hasEnchant(item, Utils.push_I)) {
+                Location playerLocation = player.getLocation();
+                World world = player.getWorld();
+
+                // Parcourir toutes les entités proches du joueur dans un rayon de 5 blocs
+                for (Entity entity : world.getNearbyEntities(playerLocation, 5, 5, 5)) {
+                    if (entity instanceof LivingEntity && entity != player) {
+                        // Calculer la direction opposée du joueur
+                        Vector direction = entity.getLocation().toVector().subtract(playerLocation.toVector()).normalize().multiply(3);
+
+                        // Ajouter une force de propulsion vers le haut
+                        direction.setY(1).normalize().multiply(2);
+
+                        // Appliquer la vélocité à l'entité
+                        entity.setVelocity(direction);
+                    }
+                }
+            }
+        }
+    }
+
+    private HashMap<UUID, Long> cooldowns = new HashMap<>();
+    private int cooldownDuration = 10; // Durée du cooldown en secondes
+
+    @EventHandler
+    public void pushCoolDown(PlayerInteractEvent event) {
+        Player player = event.getPlayer();
+
+        if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) {
+            ItemStack item = player.getInventory().getItemInMainHand();
+
+            if (Utils.hasEnchant(item, Utils.push_I)) {
+                if (isOnCooldown(player)) {
+                    // Le joueur est en cooldown, affichez un message ou empêchez l'utilisation de l'enchantement
+                    player.sendMessage("L'enchantement est en cours de recharge.");
+                    return;
+                }
+
+                // Effectuez l'action souhaitée de l'enchantement
+
+                // Mettez à jour le cooldown
+                setCooldown(player);
+            }
+        }
+    }
+
+    private boolean isOnCooldown(Player player) {
+        if (cooldowns.containsKey(player.getUniqueId())) {
+            long cooldownTime = cooldowns.get(player.getUniqueId());
+            long currentTime = System.currentTimeMillis() / 1000;
+            return (currentTime - cooldownTime) < cooldownDuration;
+        }
+        return false;
+    }
+
+    private void setCooldown(Player player) {
+        long currentTime = System.currentTimeMillis() / 1000;
+        cooldowns.put(player.getUniqueId(), currentTime);
+    }
 
 }
+
 

@@ -5,6 +5,8 @@ author: Kyll01
 version: 1.2
 commands:
   ce:
-    permission: enchant.autosmelt, enchant.telepathy, enchant.haste, enchant.oxygen, enchant.dolphin
+    permission: customenchantgui.*
   cegui:
-      permission: customenchantgui.open
+    permission: customenchantgui.*
+  celist:
+    permission: customenchantgui.celist

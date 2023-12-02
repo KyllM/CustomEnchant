@@ -32,6 +32,8 @@ public class Utils {
     public static EnchantsType haste_IV = new EnchantsType("haste4","§6Haste IV", List.of("Déposé se livre sur une Hache, une Pelle ou une Pioche afin de lui appliquer l'enchant","§6Haste IV"), List.of(ToolsType.SHOVEL,ToolsType.PICKAXE,ToolsType.AXE));
     public static EnchantsType haste_V = new EnchantsType("haste5","§6Haste V", List.of("Déposé se livre sur une Hache, une Pelle ou une Pioche afin de lui appliquer l'enchant","§6Haste V"), List.of(ToolsType.SHOVEL,ToolsType.PICKAXE,ToolsType.AXE));
     public static EnchantsType bighole_I = new EnchantsType("bighole1","§4Big Hole I", List.of("Déposé se livre sur une Pelle ou une Pioche afin de lui appliquer l'enchant","§4Big Hole I"), List.of(ToolsType.SHOVEL,ToolsType.PICKAXE));
+    public static EnchantsType bighole_II = new EnchantsType("bighole2","§4Big Hole II", List.of("Déposé se livre sur une Pelle ou une Pioche afin de lui appliquer l'enchant","§4Big Hole II"), List.of(ToolsType.SHOVEL,ToolsType.PICKAXE));
+    public static EnchantsType bighole_III = new EnchantsType("bighole3","§4Big Hole III", List.of("Déposé se livre sur une Pelle ou une Pioche afin de lui appliquer l'enchant","§4Big Hole III"), List.of(ToolsType.SHOVEL,ToolsType.PICKAXE));
     public static EnchantsType autofeed_I = new EnchantsType("autofeed1","§6Auto Feed I", List.of("Déposé se livre sur un Casque afin de lui appliquer l'enchant","§6Auto Feed I"), List.of(ToolsType.HELMET));
     public static EnchantsType autofeed_II = new EnchantsType("autofeed2","§6Auto Feed II", List.of("Déposé se livre sur un Casque afin de lui appliquer l'enchant","§6Auto Feed II"), List.of(ToolsType.HELMET));
     public static EnchantsType autofeed_III = new EnchantsType("autofeed3","§6Auto Feed III", List.of("Déposé se livre sur un Casque afin de lui appliquer l'enchant","§6Auto Feed III"), List.of(ToolsType.HELMET));
@@ -39,6 +41,21 @@ public class Utils {
     public static EnchantsType slimeboots_I = new EnchantsType("slimeboots1","§a§lSlime Boots I", List.of("Déposé se livre sur des bottes afin de lui appliquer l'enchant","§a§lSlime Boots I"), List.of(ToolsType.BOOTS));
     public static EnchantsType strangulation_I = new EnchantsType("strangulation1","§cStrangulation I", List.of("Déposé se livre sur un item afin de lui appliquer l'enchant","§cStrangulation I"),List.of(ToolsType.SHOVEL,ToolsType.PICKAXE,ToolsType.AXE));
     public static EnchantsType push_I = new EnchantsType("push1","§cPush I", List.of("Déposé se livre sur un item afin de lui appliquer l'enchant","§cPush I"),List.of(ToolsType.SHOVEL,ToolsType.PICKAXE,ToolsType.AXE));
+    public static EnchantsType autofish_I = new EnchantsType("autofish1","§bAutofish I", List.of("Déposé se livre sur une canne à pêche afin de lui appliquer l'enchant","§bAutofish I"),List.of(ToolsType.FISHING_ROD));
+    public static EnchantsType veinminer_I = new EnchantsType("veinminer1","§bVeinMiner I", List.of("Déposé se livre sur une pioche afin de lui appliquer l'enchant","§bVein Miner I"),List.of(ToolsType.PICKAXE));
+    public static EnchantsType wither_I = new EnchantsType("wither1","§8Wither I", List.of("Déposé se livre sur une armure afin de lui appliquer l'enchant","§8Wither I"),List.of(ToolsType.HELMET,ToolsType.CHESTPLATE,ToolsType.LEGGINGS,ToolsType.BOOTS));
+    public static EnchantsType wither_II = new EnchantsType("wither2","§8Wither II", List.of("Déposé se livre sur une armure afin de lui appliquer l'enchant","§8Wither II"),List.of(ToolsType.HELMET,ToolsType.CHESTPLATE,ToolsType.LEGGINGS,ToolsType.BOOTS));
+    public static EnchantsType wither_III = new EnchantsType("wither3","§8Wither III", List.of("Déposé se livre sur une armure afin de lui appliquer l'enchant","§8Wither III"),List.of(ToolsType.HELMET,ToolsType.CHESTPLATE,ToolsType.LEGGINGS,ToolsType.BOOTS));
+    public static EnchantsType poison_I = new EnchantsType("poison1","§2Poison I", List.of("Déposé se livre sur une armure afin de lui appliquer l'enchant","§2Ppoison I"),List.of(ToolsType.HELMET,ToolsType.CHESTPLATE,ToolsType.LEGGINGS,ToolsType.BOOTS));
+    public static EnchantsType poison_II = new EnchantsType("poison2","§2Poison II", List.of("Déposé se livre sur une armure afin de lui appliquer l'enchant","§2Poison II"),List.of(ToolsType.HELMET,ToolsType.CHESTPLATE,ToolsType.LEGGINGS,ToolsType.BOOTS));
+    public static EnchantsType poison_III = new EnchantsType("poison3","§2Poison III", List.of("Déposé se livre sur une armure afin de lui appliquer l'enchant","§2Poison III"),List.of(ToolsType.HELMET,ToolsType.CHESTPLATE,ToolsType.LEGGINGS,ToolsType.BOOTS));
+    public static EnchantsType fly_I = new EnchantsType("fly1","§bFly I", List.of("Déposé se livre sur des élytres afin de lui appliquer l'enchant","§bFly I"),List.of(ToolsType.ELYTRA));
+    public static EnchantsType fly_II = new EnchantsType("fly2","§bFly II", List.of("Déposé se livre sur des élytres afin de lui appliquer l'enchant","§bFly II"),List.of(ToolsType.ELYTRA));
+    public static EnchantsType fly_III = new EnchantsType("fly3","§bFly III", List.of("Déposé se livre sur des élytres afin de lui appliquer l'enchant","§bFly III"),List.of(ToolsType.ELYTRA));
+    public static EnchantsType vampirism_I = new EnchantsType("vampirism1","§cVampirism I", List.of("Déposé se livre sur une épée afin de lui appliquer l'enchant","§cVampirism I"),List.of(ToolsType.SWORD));
+    public static EnchantsType vampirism_II = new EnchantsType("vampirism2","§cVampirism II", List.of("Déposé se livre sur une épée afin de lui appliquer l'enchant","§cVampirism II"),List.of(ToolsType.SWORD));
+    public static EnchantsType boyeusedos_I = new EnchantsType("boyeusedos1","§bBoyeuse d'os I", List.of("Déposé se livre sur une épée afin de lui appliquer l'enchant","§bBoyeuse d'os I"),List.of(ToolsType.SWORD));
+    public static EnchantsType antiprojectile_I = new EnchantsType("antiprojectile1","§bAnti Projectile I", List.of("Déposé se livre sur une épée afin de lui appliquer l'enchant","§bAnti Projectile I"),List.of(ToolsType.SWORD));
 
     public static void initEnchants(){
         enchantsList.add(telepathy_I);
@@ -61,6 +78,8 @@ public class Utils {
         enchantsList.add(haste_IV);
         enchantsList.add(haste_V);
         enchantsList.add(bighole_I);
+        enchantsList.add(bighole_II);
+        enchantsList.add(bighole_III);
         enchantsList.add(autofeed_I);
         enchantsList.add(autofeed_II);
         enchantsList.add(autofeed_III);
@@ -68,6 +87,22 @@ public class Utils {
         enchantsList.add(slimeboots_I);
         enchantsList.add(strangulation_I);
         enchantsList.add(push_I);
+        //à faire
+        enchantsList.add(autofish_I);
+        enchantsList.add(veinminer_I);
+        enchantsList.add(wither_I);         //fait
+        enchantsList.add(wither_II);        //fait
+        enchantsList.add(wither_III);       //fait
+        enchantsList.add(poison_I);         //fait
+        enchantsList.add(poison_II);        //fait
+        enchantsList.add(poison_III);       //fait
+        enchantsList.add(fly_I);
+        enchantsList.add(fly_II);
+        enchantsList.add(fly_III);
+        enchantsList.add(vampirism_I);
+        enchantsList.add(vampirism_II);
+        enchantsList.add(boyeusedos_I);
+        enchantsList.add(antiprojectile_I); //fait
     }
 
     public static boolean isEnchantable(ItemStack item, EnchantsType enchant){

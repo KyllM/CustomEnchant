@@ -16,26 +16,25 @@ public class Commands implements CommandExecutor {
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         int DataTrack;
         if (sender instanceof Player p) {
-            if (label.equalsIgnoreCase("ce")) {
-                if (args.length == 1) {
-                    if (args[0].equalsIgnoreCase("list")) {
+            if (label.equalsIgnoreCase("celist")) {
 
-                        Inventory listMenu = Bukkit.createInventory(null, 54, "§2Liste des enchantements");
-                        int i = 0;
-                        for (EnchantsType enchant : Utils.getEnchantsList()) {
-                            ItemStack item = new ItemStack(Material.ENCHANTED_BOOK);
-                            ItemMeta itemMeta = item.getItemMeta();
-                            assert itemMeta != null;
-                            itemMeta.setDisplayName(enchant.displayname());
-                            itemMeta.setLore(enchant.lore());
-                            item.setItemMeta(itemMeta);
-                            listMenu.setItem(i, item);
-                            i++;
-                        }
-                        p.openInventory(listMenu);
+                Inventory listMenu = Bukkit.createInventory(null, 54, "§2Liste des enchantements");
+                int i = 0;
+                for (EnchantsType enchant : Utils.getEnchantsList()) {
+                    ItemStack item = new ItemStack(Material.ENCHANTED_BOOK);
+                    ItemMeta itemMeta = item.getItemMeta();
+                    assert itemMeta != null;
+                    itemMeta.setDisplayName(enchant.displayname());
+                    itemMeta.setLore(enchant.lore());
+                    item.setItemMeta(itemMeta);
+                    listMenu.setItem(i, item);
+                    i++;
+                }
+                p.openInventory(listMenu);
 
-                    }
-                } else if (args.length == 2) {
+            }
+            else if (label.equalsIgnoreCase("ce")) {
+                if (args.length == 2) {
                     String value = args[1];
                     switch (args[0].toLowerCase()) {
                         case "give":

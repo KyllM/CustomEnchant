@@ -16,7 +16,8 @@ public enum ToolsType {
     HELMET("_HELMET"),
     CHESTPLATE("_CHESTPLATE"),
     LEGGINGS("LEGGINGS"),
-    BOOTS("_BOOTS");
+    BOOTS("_BOOTS"),
+    ELYTRA("ELYTRA");
 
     public final String label;
 

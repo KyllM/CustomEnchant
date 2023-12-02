@@ -13,6 +13,7 @@ public class Main extends JavaPlugin implements Listener {
     public void onEnable() {
         getServer().getPluginManager().registerEvents(new Events(), this);
         getCommand("ce").setExecutor(new Commands());
+        getCommand("celist").setExecutor(new Commands());
         Utils.initEnchants();
         getLogger().info("Plugin démarré");
     }

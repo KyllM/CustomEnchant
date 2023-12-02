@@ -3,10 +3,7 @@ package fr.kyll01.customenchant;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.Container;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.Item;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
+import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
@@ -21,10 +18,12 @@ import org.bukkit.inventory.Recipe;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
+import javax.sound.midi.SysexMessage;
 import java.util.*;
 
 public class Events implements Listener {
@@ -142,6 +141,7 @@ public class Events implements Listener {
         if (itemInHand.getItemMeta() == null) return;
         // Si l'outil a Telepathy I et AutoSmelt I
 
+
         if (Utils.hasEnchant(itemInHand, Utils.telepathy_I) && Utils.hasEnchant(itemInHand, Utils.autosmelt_I)) {
             onTelepathyAndAutoSmelt(event);
         }
@@ -180,9 +180,183 @@ public class Events implements Listener {
         if (Utils.hasEnchant(itemInHand, Utils.blocktrack)) {
             updateBlockTrackData(itemInHand);
         }
+        if (Utils.hasEnchant(itemInHand, Utils.veinminer_I)) {
+            System.out.println("vein miner 1");
+            Location centerLocation = block.getLocation();
 
+
+            if (itemInHand.getType().toString().endsWith("_PICKAXE")) {
+                if (!isVeinMinable(block.getType())) {
+                    return;
+                }
+            }
+
+            if (isVeinMinable(block.getType())) {
+                // Annuler l'événement initial pour éviter que le bloc ne soit cassé immédiatement.
+                event.setCancelled(true);
+                // Appeler la méthode pour exploser la veine de minerai.
+                mineVein(player, block, event);
+            }
+
+
+        }
+
+        if (Utils.hasEnchant(itemInHand, Utils.bighole_III)) {
+            System.out.println("bigHole 3");
+            Location centerLocation = block.getLocation();
+
+            if (itemInHand.getType().toString().endsWith("_SHOVEL")) {
+                if (!isBreakableBlockShovel(block.getType())) {
+                    return;
+                }
+            }
+
+            if (itemInHand.getType().toString().endsWith("_PICKAXE")) {
+                if (!isBreakableBlockPickaxe(block.getType())) {
+                    return;
+                }
+            }
+
+            // Parcourir chaque bloc dans le carré 3x3 autour du bloc cassé
+            for (int xOffset = -3; xOffset <= 3; xOffset++) {
+                for (int yOffset = -3; yOffset <= 3; yOffset++) {
+                    for (int zOffset = -3; zOffset <= 3; zOffset++) {
+                        Block relativeBlock = centerLocation.clone().add(xOffset, yOffset, zOffset).getBlock();
+                        Collection<ItemStack> relativeBlockDrops = relativeBlock.getDrops(player.getInventory().getItemInMainHand());
+
+                        if (itemInHand.getType().toString().endsWith("_SHOVEL")) {
+                            if (isBreakableBlockShovel(relativeBlock.getType())) {
+                                if (Utils.hasEnchant(itemInHand, Utils.telepathy_I)) {
+                                    if (event.getPlayer().getInventory().firstEmpty() == -1) {
+                                        relativeBlock.breakNaturally(player.getInventory().getItemInMainHand());
+                                    }
+
+                                    relativeBlock.setType(Material.AIR);
+                                    onTelepathy(event, relativeBlockDrops);
+
+                                } else {
+                                    relativeBlock.breakNaturally(player.getInventory().getItemInMainHand());
+                                }
+                            }
+                        }
+                        if (itemInHand.getType().toString().endsWith("_PICKAXE")) {
+                            if (isBreakableBlockPickaxe(relativeBlock.getType())) {
+
+                                // Si l'outil a AutoSmelt
+                                if (!Utils.hasEnchant(itemInHand, Utils.telepathy_I) && Utils.hasEnchant(itemInHand, Utils.autosmelt_I)) {
+                                    onAutoSmeltBigHole(event, relativeBlock, relativeBlockDrops);
+                                } else if (Utils.hasEnchant(itemInHand, Utils.telepathy_I) && Utils.hasEnchant(itemInHand, Utils.autosmelt_I)) {
+
+                                    if (event.getPlayer().getInventory().firstEmpty() == -1) {
+                                        onAutoSmeltBigHole(event, relativeBlock, relativeBlockDrops);
+                                    } else {
+                                        onTelepathyAndAutoSmelt(event);
+                                    }
+                                } else if (Utils.hasEnchant(itemInHand, Utils.telepathy_I) && !Utils.hasEnchant(itemInHand, Utils.autosmelt_I)) {
+
+                                    if (event.getPlayer().getInventory().firstEmpty() == -1) {
+                                        relativeBlock.breakNaturally(player.getInventory().getItemInMainHand());
+                                    }
+
+                                    onTelepathy(event, relativeBlockDrops);
+
+                                }
+                                if (Utils.hasEnchant(itemInHand, Utils.blocktrack)) {
+                                    updateBlockTrackData(itemInHand);
+                                }
+                                if (!Utils.hasEnchant(itemInHand, Utils.telepathy_I) && !Utils.hasEnchant(itemInHand, Utils.autosmelt_I)) {
+                                    relativeBlock.breakNaturally(player.getInventory().getItemInMainHand());
+                                }
+                                relativeBlock.setType(Material.AIR);
+                            }
+
+                        }
+                    }
+                }
+            }
+
+
+        }
+
+        if (Utils.hasEnchant(itemInHand, Utils.bighole_II)) {
+            System.out.println("bigHole 2");
+            Location centerLocation = block.getLocation();
+
+            if (itemInHand.getType().toString().endsWith("_SHOVEL")) {
+                if (!isBreakableBlockShovel(block.getType())) {
+                    return;
+                }
+            }
+
+            if (itemInHand.getType().toString().endsWith("_PICKAXE")) {
+                if (!isBreakableBlockPickaxe(block.getType())) {
+                    return;
+                }
+            }
+
+            // Parcourir chaque bloc dans le carré 3x3 autour du bloc cassé
+            for (int xOffset = -2; xOffset <= 2; xOffset++) {
+                for (int yOffset = -2; yOffset <= 2; yOffset++) {
+                    for (int zOffset = -2; zOffset <= 2; zOffset++) {
+                        Block relativeBlock = centerLocation.clone().add(xOffset, yOffset, zOffset).getBlock();
+                        Collection<ItemStack> relativeBlockDrops = relativeBlock.getDrops(player.getInventory().getItemInMainHand());
+
+                        if (itemInHand.getType().toString().endsWith("_SHOVEL")) {
+                            if (isBreakableBlockShovel(relativeBlock.getType())) {
+                                if (Utils.hasEnchant(itemInHand, Utils.telepathy_I)) {
+                                    if (event.getPlayer().getInventory().firstEmpty() == -1) {
+                                        relativeBlock.breakNaturally(player.getInventory().getItemInMainHand());
+                                    }
+
+                                    relativeBlock.setType(Material.AIR);
+                                    onTelepathy(event, relativeBlockDrops);
+
+                                } else {
+                                    relativeBlock.breakNaturally(player.getInventory().getItemInMainHand());
+                                }
+                            }
+                        }
+                        if (itemInHand.getType().toString().endsWith("_PICKAXE")) {
+                            if (isBreakableBlockPickaxe(relativeBlock.getType())) {
+
+                                // Si l'outil a AutoSmelt
+                                if (!Utils.hasEnchant(itemInHand, Utils.telepathy_I) && Utils.hasEnchant(itemInHand, Utils.autosmelt_I)) {
+                                    onAutoSmeltBigHole(event, relativeBlock, relativeBlockDrops);
+                                } else if (Utils.hasEnchant(itemInHand, Utils.telepathy_I) && Utils.hasEnchant(itemInHand, Utils.autosmelt_I)) {
+
+                                    if (event.getPlayer().getInventory().firstEmpty() == -1) {
+                                        onAutoSmeltBigHole(event, relativeBlock, relativeBlockDrops);
+                                    } else {
+                                        onTelepathyAndAutoSmelt(event);
+                                    }
+                                } else if (Utils.hasEnchant(itemInHand, Utils.telepathy_I) && !Utils.hasEnchant(itemInHand, Utils.autosmelt_I)) {
+
+                                    if (event.getPlayer().getInventory().firstEmpty() == -1) {
+                                        relativeBlock.breakNaturally(player.getInventory().getItemInMainHand());
+                                    }
+
+                                    onTelepathy(event, relativeBlockDrops);
+
+                                }
+                                if (Utils.hasEnchant(itemInHand, Utils.blocktrack)) {
+                                    updateBlockTrackData(itemInHand);
+                                }
+                                if (!Utils.hasEnchant(itemInHand, Utils.telepathy_I) && !Utils.hasEnchant(itemInHand, Utils.autosmelt_I)) {
+                                    relativeBlock.breakNaturally(player.getInventory().getItemInMainHand());
+                                }
+                                relativeBlock.setType(Material.AIR);
+                            }
+
+                        }
+                    }
+                }
+            }
+
+
+        }
 
         if (Utils.hasEnchant(itemInHand, Utils.bighole_I)) {
+            System.out.println("bigHole 1");
             Location centerLocation = block.getLocation();
 
             if (itemInHand.getType().toString().endsWith("_SHOVEL")) {
@@ -259,6 +433,101 @@ public class Events implements Listener {
         }
     }
 
+    private void mineVein(Player player, Block block, BlockBreakEvent event) {
+
+        ItemStack itemInHand = player.getInventory().getItemInMainHand();
+        ItemMeta itemMeta = itemInHand.getItemMeta();
+        //event.setDropItems(false);
+
+        // Casser le bloc actuel.
+
+        Location centerLocation = block.getLocation();
+
+        // Explorer les blocs adjacents.
+        for (int xOffset = -1; xOffset <= 1; xOffset++) {
+            for (int yOffset = -1; yOffset <= 1; yOffset++) {
+                for (int zOffset = -1; zOffset <= 1; zOffset++) {
+                    if (xOffset == 0 && yOffset == 0 && zOffset == 0) {
+                        continue;  // Ignore le bloc central (celui que nous venons de casser).
+                    }
+                    Block relativeBlock = centerLocation.clone().add(xOffset, yOffset, zOffset).getBlock();
+                    Collection<ItemStack> relativeBlockDrops = relativeBlock.getDrops(player.getInventory().getItemInMainHand());
+                    Block adjacentBlock = block.getRelative(xOffset, yOffset, zOffset);
+                    if (isVeinMinable(adjacentBlock.getType())) {
+                        // Si l'outil a AutoSmelt
+
+                        if (!Utils.hasEnchant(itemInHand, Utils.telepathy_I) && Utils.hasEnchant(itemInHand, Utils.autosmelt_I)) {
+                            if (event.getBlock().getState() instanceof Container) return;
+                            if (relativeBlockDrops.isEmpty()) return;
+                            //event.setDropItems(false);
+                            Iterator<Recipe> recipes = Bukkit.recipeIterator();
+                            while (recipes.hasNext()) {
+                                Recipe recipe = recipes.next();
+                                if (recipe instanceof FurnaceRecipe) {
+
+                                    FurnaceRecipe furnacerecipe = (FurnaceRecipe) recipe;
+
+                                    for (int i = 0; i < relativeBlock.getDrops().size(); i++) {
+                                        ItemStack drop = relativeBlock.getDrops().iterator().next();
+                                        if (!isAutoSmeltable(drop.getType())) {
+                                            relativeBlock.breakNaturally(player.getInventory().getItemInMainHand());
+                                        }
+                                        if (furnacerecipe.getInputChoice().test(drop)) {
+                                            ItemStack newdrop = furnacerecipe.getResult();
+                                            newdrop.setAmount(drop.getAmount());
+                                            relativeBlock.getDrops().remove(relativeBlock.getDrops().iterator().next());
+                                            event.getBlock().getWorld().dropItemNaturally(event.getBlock().getLocation(), newdrop);
+                                        }
+                                    }
+                                }
+                            }
+                            block.breakNaturally(itemInHand);
+                        }
+                        else if (Utils.hasEnchant(itemInHand, Utils.telepathy_I) && Utils.hasEnchant(itemInHand, Utils.autosmelt_I)) {
+                            if (event.getPlayer().getInventory().firstEmpty() == -1) {
+                                onAutoSmeltVeinMiner(event, adjacentBlock, relativeBlockDrops);
+                            } else {
+                                onTelepathyAndAutoSmelt(event);
+                            }
+                        } else if (Utils.hasEnchant(itemInHand, Utils.telepathy_I) && !Utils.hasEnchant(itemInHand, Utils.autosmelt_I)) {
+                            if (event.getPlayer().getInventory().firstEmpty() == -1) {
+                                //adjacentBlock.breakNaturally(itemInHand);
+                            }
+                            if (event.getPlayer().getInventory().firstEmpty() == -1) return;
+                            if (event.getBlock().getState() instanceof Container) return;
+                            event.setDropItems(false);
+                            if (relativeBlockDrops.isEmpty()) return;
+                            for (ItemStack drop : relativeBlockDrops) {
+                                player.getInventory().addItem(drop);
+                                adjacentBlock.setType(Material.AIR);
+                            }
+                        }
+
+                        if (Utils.hasEnchant(itemInHand, Utils.blocktrack)) {
+                            updateBlockTrackData(itemInHand);
+                        }
+
+                        if (!Utils.hasEnchant(itemInHand, Utils.telepathy_I) && !Utils.hasEnchant(itemInHand, Utils.autosmelt_I)) {
+                            adjacentBlock.breakNaturally(itemInHand);
+                            mineVein(player, adjacentBlock, event);
+                        }
+
+                        //
+
+                        // Récursion pour exploser la veine du bloc adjacent.
+                        mineVein(player, adjacentBlock, event);
+                    }
+                }
+            }
+        }
+    }
+
+    private void onAutoSmeltVeinMiner(BlockBreakEvent event, Block relativeBlock, Collection<ItemStack> relativeBlockDrops) {
+
+        Player player = event.getPlayer();
+
+    }
+
     public boolean isBreakableBlockShovel(Material material) {
         return (material.toString() == "DIRT"
                 || material.toString() == "GRAVEL"
@@ -292,6 +561,9 @@ public class Events implements Listener {
                 || material.toString() == "PRISMARINE_BRICKS"
                 || material.toString() == "DARK_PRISMARINE"
                 || material.toString() == "SMOOTH_STONE");
+    }
+    public boolean isVeinMinable(Material material) {
+        return (material.toString().endsWith("_ORE"));
     }
 
     public void onAutoSmeltBigHole(BlockBreakEvent event, Block relativeBlock, Collection<ItemStack> relativeBlockDrops) {
@@ -444,6 +716,23 @@ public class Events implements Listener {
 
     @EventHandler
     public void onPlayerFish(PlayerFishEvent event) {
+        //enchant autofish
+        if (event.getState() == PlayerFishEvent.State.BITE) {
+            ItemStack fishingRod = event.getPlayer().getInventory().getItemInMainHand();
+
+            if (Utils.hasEnchant(fishingRod, Utils.autofish_I)) {
+                System.out.println("autofish 1 ");
+
+                event.getHook().pullHookedEntity();
+                System.out.println("autofish 2 ");
+                if(event.getHook().doesBounce()){
+                    System.out.println("autofish 3 ");
+                    event.getHook().pullHookedEntity();
+                    System.out.println("autofish 4 ");
+                }
+            }
+        }
+
         if (event.getState() == PlayerFishEvent.State.CAUGHT_FISH) {
             ItemStack fishingRod = event.getPlayer().getInventory().getItemInMainHand();
             if (Utils.hasEnchant(fishingRod, Utils.fishtrack)) {
@@ -684,6 +973,7 @@ public class Events implements Listener {
 
     @EventHandler
     public void onEntityDamageByPlayer(EntityDamageByEntityEvent event) {
+
         if (event.getCause() == EntityDamageEvent.DamageCause.LIGHTNING && event.getEntity() instanceof Player) {
             event.setCancelled(true);
         }
@@ -695,8 +985,117 @@ public class Events implements Listener {
                 summonLightning(entity);
             }
         }
-    }
 
+        if (event.getEntity() instanceof Player) {
+            Player player = (Player) event.getEntity();
+            ItemStack itemBoots = player.getInventory().getBoots();
+            ItemStack itemLeggings = player.getInventory().getLeggings();
+            ItemStack itemChestplate = player.getInventory().getChestplate();
+            ItemStack itemHelmet = player.getInventory().getHelmet();
+            boolean damagedByEntity = false;
+            if (event.getCause() == EntityDamageEvent.DamageCause.DRAGON_BREATH ||
+                    event.getCause() == EntityDamageEvent.DamageCause.ENTITY_ATTACK ||
+                    event.getCause() == EntityDamageEvent.DamageCause.ENTITY_EXPLOSION ||
+                    event.getCause() == EntityDamageEvent.DamageCause.ENTITY_SWEEP_ATTACK ||
+                    event.getCause() == EntityDamageEvent.DamageCause.PROJECTILE) {
+                damagedByEntity = true;
+            }
+            if (damagedByEntity == true){
+                    if(Utils.hasEnchant(itemBoots, Utils.poison_I) ||
+                            Utils.hasEnchant(itemLeggings, Utils.poison_I) ||
+                            Utils.hasEnchant(itemChestplate, Utils.poison_I) ||
+                            Utils.hasEnchant(itemHelmet, Utils.poison_I)){
+                    Entity entity = event.getDamager();
+                    if (entity instanceof LivingEntity) {
+                        LivingEntity livingEntity = (LivingEntity) entity;
+
+                        PotionEffectType effectType = PotionEffectType.POISON;
+                        PotionEffect potionEffect = new PotionEffect(effectType, 100, 1);
+
+                        livingEntity.addPotionEffect(potionEffect);
+                    }
+                }
+                    if(Utils.hasEnchant(itemBoots, Utils.poison_II) ||
+                            Utils.hasEnchant(itemLeggings, Utils.poison_II) ||
+                            Utils.hasEnchant(itemChestplate, Utils.poison_II) ||
+                            Utils.hasEnchant(itemHelmet, Utils.poison_II)){
+                    Entity entity = event.getDamager();
+                    if (entity instanceof LivingEntity) {
+                        LivingEntity livingEntity = (LivingEntity) entity;
+
+                        PotionEffectType effectType = PotionEffectType.POISON;
+                        PotionEffect potionEffect = new PotionEffect(effectType, 100, 2);
+
+                        livingEntity.addPotionEffect(potionEffect);
+                    }
+                }
+                    if(Utils.hasEnchant(itemBoots, Utils.poison_III) ||
+                            Utils.hasEnchant(itemLeggings, Utils.poison_III) ||
+                            Utils.hasEnchant(itemChestplate, Utils.poison_III) ||
+                            Utils.hasEnchant(itemHelmet, Utils.poison_III)){
+                    Entity entity = event.getDamager();
+                    if (entity instanceof LivingEntity) {
+                        LivingEntity livingEntity = (LivingEntity) entity;
+
+                        PotionEffectType effectType = PotionEffectType.POISON;
+                        PotionEffect potionEffect = new PotionEffect(effectType, 100, 3);
+
+                        livingEntity.addPotionEffect(potionEffect);
+                    }
+                }
+                    if(Utils.hasEnchant(itemBoots, Utils.wither_I) ||
+                            Utils.hasEnchant(itemLeggings, Utils.wither_I) ||
+                            Utils.hasEnchant(itemChestplate, Utils.wither_I) ||
+                            Utils.hasEnchant(itemHelmet, Utils.wither_I)){
+                    Entity entity = event.getDamager();
+                    if (entity instanceof LivingEntity) {
+                        LivingEntity livingEntity = (LivingEntity) entity;
+
+                        PotionEffectType effectType = PotionEffectType.WITHER;
+                        PotionEffect potionEffect = new PotionEffect(effectType, 100, 1);
+
+                        livingEntity.addPotionEffect(potionEffect);
+                    }
+                }
+                    if(Utils.hasEnchant(itemBoots, Utils.wither_II) ||
+                            Utils.hasEnchant(itemLeggings, Utils.wither_II) ||
+                            Utils.hasEnchant(itemChestplate, Utils.wither_II) ||
+                            Utils.hasEnchant(itemHelmet, Utils.wither_II)){
+                    Entity entity = event.getDamager();
+                    if (entity instanceof LivingEntity) {
+                        LivingEntity livingEntity = (LivingEntity) entity;
+
+                        PotionEffectType effectType = PotionEffectType.WITHER;
+                        PotionEffect potionEffect = new PotionEffect(effectType, 100, 2);
+
+                        livingEntity.addPotionEffect(potionEffect);
+                    }
+                }
+                    if(Utils.hasEnchant(itemBoots, Utils.wither_III) ||
+                            Utils.hasEnchant(itemLeggings, Utils.wither_III) ||
+                            Utils.hasEnchant(itemChestplate, Utils.wither_III) ||
+                            Utils.hasEnchant(itemHelmet, Utils.wither_III)){
+                    Entity entity = event.getDamager();
+                    if (entity instanceof LivingEntity) {
+                        LivingEntity livingEntity = (LivingEntity) entity;
+
+                        PotionEffectType effectType = PotionEffectType.WITHER;
+                        PotionEffect potionEffect = new PotionEffect(effectType, 100, 3);
+
+                        livingEntity.addPotionEffect(potionEffect);
+                    }
+                }
+            }
+
+            if(event.getCause() == EntityDamageEvent.DamageCause.PROJECTILE &&
+                    (Utils.hasEnchant(itemBoots, Utils.antiprojectile_I) ||
+                    Utils.hasEnchant(itemLeggings, Utils.antiprojectile_I) ||
+                    Utils.hasEnchant(itemChestplate, Utils.antiprojectile_I) ||
+                    Utils.hasEnchant(itemHelmet, Utils.antiprojectile_I))){
+                event.setCancelled(true);
+            }
+        }
+    }
     public void summonLightning(Entity entity) {
         Location entityLocation = entity.getLocation();
         entity.getWorld().strikeLightning(entityLocation);
@@ -707,6 +1106,9 @@ public class Events implements Listener {
         if (event.getEntity() instanceof Player) {
             Player player = (Player) event.getEntity();
             ItemStack itemBoots = player.getInventory().getBoots();
+            ItemStack itemLeggings = player.getInventory().getLeggings();
+            ItemStack itemChestplate = player.getInventory().getChestplate();
+            ItemStack itemHelmet = player.getInventory().getHelmet();
             if (event.getCause() == EntityDamageEvent.DamageCause.FALL && Utils.hasEnchant(itemBoots, Utils.slimeboots_I)) {
                 event.setCancelled(true);
             }
@@ -820,6 +1222,10 @@ public class Events implements Listener {
         cooldowns.put(player.getUniqueId(), currentTime);
     }
 
+
 }
+
+
+
 
 

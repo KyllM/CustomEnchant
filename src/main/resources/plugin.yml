@@ -10,3 +10,5 @@ commands:
     permission: customenchantgui.*
   celist:
     permission: customenchantgui.celist
+  cegive:
+    permission: customenchantgui.cegive

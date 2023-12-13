@@ -33,6 +33,13 @@ public class Commands implements CommandExecutor {
                 p.openInventory(listMenu);
 
             }
+            if (label.equalsIgnoreCase("cegive")) {
+                if (args.length == 2) {
+                    String nomLivre = args[1];
+                    Utils.giveBook(p, nomLivre);
+                }
+
+            }
             else if (label.equalsIgnoreCase("ce")) {
                 if (args.length == 2) {
                     String value = args[1];

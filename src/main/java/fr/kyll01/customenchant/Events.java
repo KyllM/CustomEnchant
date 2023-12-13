@@ -180,29 +180,9 @@ public class Events implements Listener {
         if (Utils.hasEnchant(itemInHand, Utils.blocktrack)) {
             updateBlockTrackData(itemInHand);
         }
-        if (Utils.hasEnchant(itemInHand, Utils.veinminer_I)) {
-            System.out.println("vein miner 1");
-            Location centerLocation = block.getLocation();
-
-
-            if (itemInHand.getType().toString().endsWith("_PICKAXE")) {
-                if (!isVeinMinable(block.getType())) {
-                    return;
-                }
-            }
-
-            if (isVeinMinable(block.getType())) {
-                // Annuler l'événement initial pour éviter que le bloc ne soit cassé immédiatement.
-                event.setCancelled(true);
-                // Appeler la méthode pour exploser la veine de minerai.
-                mineVein(player, block, event);
-            }
-
-
-        }
 
         if (Utils.hasEnchant(itemInHand, Utils.bighole_III)) {
-            System.out.println("bigHole 3");
+            //System.out.println("bigHole 3");
             Location centerLocation = block.getLocation();
 
             if (itemInHand.getType().toString().endsWith("_SHOVEL")) {
@@ -279,7 +259,7 @@ public class Events implements Listener {
         }
 
         if (Utils.hasEnchant(itemInHand, Utils.bighole_II)) {
-            System.out.println("bigHole 2");
+            //System.out.println("bigHole 2");
             Location centerLocation = block.getLocation();
 
             if (itemInHand.getType().toString().endsWith("_SHOVEL")) {
@@ -356,7 +336,7 @@ public class Events implements Listener {
         }
 
         if (Utils.hasEnchant(itemInHand, Utils.bighole_I)) {
-            System.out.println("bigHole 1");
+            //System.out.println("bigHole 1");
             Location centerLocation = block.getLocation();
 
             if (itemInHand.getType().toString().endsWith("_SHOVEL")) {
@@ -431,6 +411,35 @@ public class Events implements Listener {
 
 
         }
+
+        if (Utils.hasEnchant(itemInHand, Utils.veinminer_I)) {
+            //System.out.println("vein miner 1");
+            Location centerLocation = block.getLocation();
+            if (Utils.hasEnchant(itemInHand, Utils.bighole_I)) {
+                return;
+            }
+            if (Utils.hasEnchant(itemInHand, Utils.bighole_III)) {
+                return;
+            }
+            if (Utils.hasEnchant(itemInHand, Utils.bighole_III)) {
+                return;
+            }
+
+            if (itemInHand.getType().toString().endsWith("_PICKAXE")) {
+                if (!isVeinMinable(block.getType())) {
+                    return;
+                }
+            }
+
+            if (isVeinMinable(block.getType())) {
+                // Annuler l'événement initial pour éviter que le bloc ne soit cassé immédiatement.
+                event.setCancelled(true);
+                // Appeler la méthode pour exploser la veine de minerai.
+                mineVein(player, block, event);
+            }
+
+
+        }
     }
 
     private void mineVein(Player player, Block block, BlockBreakEvent event) {
@@ -447,19 +456,20 @@ public class Events implements Listener {
         for (int xOffset = -1; xOffset <= 1; xOffset++) {
             for (int yOffset = -1; yOffset <= 1; yOffset++) {
                 for (int zOffset = -1; zOffset <= 1; zOffset++) {
-                    if (xOffset == 0 && yOffset == 0 && zOffset == 0) {
+                    Block adjacentBlock = block.getRelative(xOffset, yOffset, zOffset);
+                    /*if (xOffset == 0 && yOffset == 0 && zOffset == 0) {
                         continue;  // Ignore le bloc central (celui que nous venons de casser).
                     }
                     Block relativeBlock = centerLocation.clone().add(xOffset, yOffset, zOffset).getBlock();
                     Collection<ItemStack> relativeBlockDrops = relativeBlock.getDrops(player.getInventory().getItemInMainHand());
-                    Block adjacentBlock = block.getRelative(xOffset, yOffset, zOffset);
+
                     if (isVeinMinable(adjacentBlock.getType())) {
                         // Si l'outil a AutoSmelt
 
                         if (!Utils.hasEnchant(itemInHand, Utils.telepathy_I) && Utils.hasEnchant(itemInHand, Utils.autosmelt_I)) {
                             if (event.getBlock().getState() instanceof Container) return;
                             if (relativeBlockDrops.isEmpty()) return;
-                            //event.setDropItems(false);
+                            event.setDropItems(false);
                             Iterator<Recipe> recipes = Bukkit.recipeIterator();
                             while (recipes.hasNext()) {
                                 Recipe recipe = recipes.next();
@@ -481,7 +491,8 @@ public class Events implements Listener {
                                     }
                                 }
                             }
-                            block.breakNaturally(itemInHand);
+                            //block.breakNaturally(itemInHand);
+                            block.setType(Material.AIR);
                         }
                         else if (Utils.hasEnchant(itemInHand, Utils.telepathy_I) && Utils.hasEnchant(itemInHand, Utils.autosmelt_I)) {
                             if (event.getPlayer().getInventory().firstEmpty() == -1) {
@@ -499,7 +510,9 @@ public class Events implements Listener {
                             if (relativeBlockDrops.isEmpty()) return;
                             for (ItemStack drop : relativeBlockDrops) {
                                 player.getInventory().addItem(drop);
-                                adjacentBlock.setType(Material.AIR);
+                                block.setType(Material.AIR);
+                                block.breakNaturally(itemInHand);
+
                             }
                         }
 
@@ -510,13 +523,16 @@ public class Events implements Listener {
                         if (!Utils.hasEnchant(itemInHand, Utils.telepathy_I) && !Utils.hasEnchant(itemInHand, Utils.autosmelt_I)) {
                             adjacentBlock.breakNaturally(itemInHand);
                             mineVein(player, adjacentBlock, event);
+
+
                         }
 
                         //
 
-                        // Récursion pour exploser la veine du bloc adjacent.
+                        // Récursion pour exploser la veine du bloc adjacent.*/
+                    adjacentBlock.breakNaturally(itemInHand);
                         mineVein(player, adjacentBlock, event);
-                    }
+                    //}
                 }
             }
         }
@@ -637,7 +653,7 @@ public class Events implements Listener {
         event.setDropItems(false);
         ItemStack dropblock = block.getDrops().iterator().next();
         if (!isAutoSmeltable(dropblock.getType())) {
-            System.out.println("Auto Smeltable false");
+            //System.out.println("Auto Smeltable false");
             onTelepathy(event, drops);
         } else {
             while (recipes.hasNext()) {
@@ -650,7 +666,7 @@ public class Events implements Listener {
                     for (int i = 0; i < block.getDrops().size(); i++) {
                         ItemStack drop = block.getDrops().iterator().next();
                         if (furnacerecipe.getInputChoice().test(drop)) {
-                            System.out.println("Auto Smeltable true");
+                            //System.out.println("Auto Smeltable true");
                             ItemStack newdrop = furnacerecipe.getResult();
                             newdrop.setAmount(drop.getAmount());
                             block.getDrops().remove(block.getDrops().iterator().next());
@@ -721,14 +737,14 @@ public class Events implements Listener {
             ItemStack fishingRod = event.getPlayer().getInventory().getItemInMainHand();
 
             if (Utils.hasEnchant(fishingRod, Utils.autofish_I)) {
-                System.out.println("autofish 1 ");
+                //System.out.println("autofish 1 ");
 
                 event.getHook().pullHookedEntity();
-                System.out.println("autofish 2 ");
+                //System.out.println("autofish 2 ");
                 if(event.getHook().doesBounce()){
-                    System.out.println("autofish 3 ");
+                    //System.out.println("autofish 3 ");
                     event.getHook().pullHookedEntity();
-                    System.out.println("autofish 4 ");
+                    //System.out.println("autofish 4 ");
                 }
             }
         }
@@ -818,23 +834,26 @@ public class Events implements Listener {
         if (itemInHand.getItemMeta() == null) return;
         if (Utils.hasEnchant(itemInHand, Utils.haste_I)) {
             PotionEffectType effect = PotionEffectType.FAST_DIGGING;
-            player.addPotionEffect(effect.createEffect(200, 1));
+            player.addPotionEffect(effect.createEffect(999999, 1));
         }
-        if (Utils.hasEnchant(itemInHand, Utils.haste_II)) {
+        else if (Utils.hasEnchant(itemInHand, Utils.haste_II)) {
             PotionEffectType effect = PotionEffectType.FAST_DIGGING;
-            player.addPotionEffect(effect.createEffect(200, 2));
+            player.addPotionEffect(effect.createEffect(999999, 2));
         }
-        if (Utils.hasEnchant(itemInHand, Utils.haste_III)) {
+        else if (Utils.hasEnchant(itemInHand, Utils.haste_III)) {
             PotionEffectType effect = PotionEffectType.FAST_DIGGING;
-            player.addPotionEffect(effect.createEffect(200, 3));
+            player.addPotionEffect(effect.createEffect(999999, 3));
         }
-        if (Utils.hasEnchant(itemInHand, Utils.haste_IV)) {
+        else if (Utils.hasEnchant(itemInHand, Utils.haste_IV)) {
             PotionEffectType effect = PotionEffectType.FAST_DIGGING;
-            player.addPotionEffect(effect.createEffect(200, 4));
+            player.addPotionEffect(effect.createEffect(999999, 4));
         }
-        if (Utils.hasEnchant(itemInHand, Utils.haste_V)) {
+        else if (Utils.hasEnchant(itemInHand, Utils.haste_V)) {
             PotionEffectType effect = PotionEffectType.FAST_DIGGING;
-            player.addPotionEffect(effect.createEffect(200, 5));
+            player.addPotionEffect(effect.createEffect(999999, 5));
+        }
+        else{
+            player.removePotionEffect(PotionEffectType.FAST_DIGGING);
         }
         if (Utils.hasEnchant(itemInHand, Utils.stormbreaker_I)) {
             if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) {
@@ -851,21 +870,25 @@ public class Events implements Listener {
         ItemStack itemBoots = e.getPlayer().getInventory().getBoots();
         ItemStack itemLeggings = e.getPlayer().getInventory().getLeggings();
         ItemStack itemHelmet = e.getPlayer().getInventory().getHelmet();
+        ItemStack itemChestplate = e.getPlayer().getInventory().getChestplate();
         if (itemLeggings != null) {
             if (p != null) {
                 if (itemLeggings == null) return;
                 if (itemLeggings.hasItemMeta() && !(itemLeggings.getItemMeta() == null)) {
                     if (Utils.hasEnchant(itemLeggings, Utils.dolphin_I)) {
                         PotionEffectType effect = PotionEffectType.DOLPHINS_GRACE;
-                        p.addPotionEffect(effect.createEffect(200, 0));
+                        p.addPotionEffect(effect.createEffect(999999, 0));
                     }
-                    if (Utils.hasEnchant(itemLeggings, Utils.dolphin_II)) {
+                    else if (Utils.hasEnchant(itemLeggings, Utils.dolphin_II)) {
                         PotionEffectType effect = PotionEffectType.DOLPHINS_GRACE;
-                        p.addPotionEffect(effect.createEffect(200, 1));
+                        p.addPotionEffect(effect.createEffect(999999, 1));
                     }
-                    if (Utils.hasEnchant(itemLeggings, Utils.dolphin_III)) {
+                    else if (Utils.hasEnchant(itemLeggings, Utils.dolphin_III)) {
                         PotionEffectType effect = PotionEffectType.DOLPHINS_GRACE;
-                        p.addPotionEffect(effect.createEffect(200, 2));
+                        p.addPotionEffect(effect.createEffect(999999, 2));
+                    }
+                    else{
+                        p.removePotionEffect(PotionEffectType.DOLPHINS_GRACE);
                     }
                 }
             }
@@ -876,15 +899,18 @@ public class Events implements Listener {
                 if (itemHelmet.hasItemMeta() && !(itemHelmet.getItemMeta() == null)) {
                     if (Utils.hasEnchant(itemHelmet, Utils.autofeed_I)) {
                         PotionEffectType effect = PotionEffectType.SATURATION;
-                        p.addPotionEffect(effect.createEffect(200, 0));
+                        p.addPotionEffect(effect.createEffect(999999, 0));
                     }
                     if (Utils.hasEnchant(itemHelmet, Utils.autofeed_II)) {
                         PotionEffectType effect = PotionEffectType.SATURATION;
-                        p.addPotionEffect(effect.createEffect(200, 1));
+                        p.addPotionEffect(effect.createEffect(999999, 1));
                     }
                     if (Utils.hasEnchant(itemHelmet, Utils.autofeed_III)) {
                         PotionEffectType effect = PotionEffectType.SATURATION;
-                        p.addPotionEffect(effect.createEffect(200, 2));
+                        p.addPotionEffect(effect.createEffect(999999, 2));
+                    }
+                    else{
+                        p.removePotionEffect(PotionEffectType.SATURATION);
                     }
                 }
             }
@@ -895,23 +921,26 @@ public class Events implements Listener {
                 if (itemBoots.hasItemMeta() && !(itemBoots.getItemMeta() == null)) {
                     if (Utils.hasEnchant(itemBoots, Utils.speed_I)) {
                         PotionEffectType effect = PotionEffectType.SPEED;
-                        p.addPotionEffect(effect.createEffect(200, 1));
+                        p.addPotionEffect(effect.createEffect(999999, 1));
                     }
                     if (Utils.hasEnchant(itemBoots, Utils.speed_II)) {
                         PotionEffectType effect = PotionEffectType.SPEED;
-                        p.addPotionEffect(effect.createEffect(200, 2));
+                        p.addPotionEffect(effect.createEffect(999999, 2));
                     }
                     if (Utils.hasEnchant(itemBoots, Utils.speed_III)) {
                         PotionEffectType effect = PotionEffectType.SPEED;
-                        p.addPotionEffect(effect.createEffect(200, 3));
+                        p.addPotionEffect(effect.createEffect(999999, 3));
                     }
                     if (Utils.hasEnchant(itemBoots, Utils.speed_IV)) {
                         PotionEffectType effect = PotionEffectType.SPEED;
-                        p.addPotionEffect(effect.createEffect(200, 4));
+                        p.addPotionEffect(effect.createEffect(999999, 4));
                     }
                     if (Utils.hasEnchant(itemBoots, Utils.speed_V)) {
                         PotionEffectType effect = PotionEffectType.SPEED;
-                        p.addPotionEffect(effect.createEffect(200, 5));
+                        p.addPotionEffect(effect.createEffect(999999, 5));
+                    }
+                    else{
+                        p.removePotionEffect(PotionEffectType.SPEED);
                     }
 
                     // Vérifie si les données des blocs parcourus existent déjà dans les données de l'item
@@ -966,6 +995,19 @@ public class Events implements Listener {
                 }
             }
         }
+        if (itemChestplate != null) {
+            if (p != null) {
+                if (itemHelmet == null) return;
+                if (itemHelmet.hasItemMeta() && !(itemHelmet.getItemMeta() == null)) {
+                    if (Utils.hasEnchant(itemHelmet, Utils.fly_I)) {
+                        p.setAllowFlight(true);
+                    }
+                    else{
+                        p.setAllowFlight(false);
+                    }
+                }
+            }
+        }
     }
 
 
@@ -983,6 +1025,22 @@ public class Events implements Listener {
             ItemStack itemInHand = player.getInventory().getItemInMainHand();
             if (Utils.hasEnchant(itemInHand, Utils.stormbreaker_I)) {
                 summonLightning(entity);
+            }
+            if (Utils.hasEnchant(itemInHand, Utils.vampirism_I)) {
+                //regen 0.25 coeur
+                double pv = player.getHealth();
+                player.setHealth(pv + 0.25);
+            } else if (Utils.hasEnchant(itemInHand, Utils.vampirism_II)) {
+                //regen 0.5 coeur
+                double pv = player.getHealth();
+                player.setHealth(pv + 0.5);
+                //Particle particle = Particle.HEART;
+            }
+            if (Utils.hasEnchant(itemInHand, Utils.broyeusedos_I)) {
+                //fait des dégats supplémentaires
+                if (Objects.requireNonNull(entity.getLastDamageCause()).getEntityType() == EntityType.SKELETON) {
+                    entity.damage(0.5);
+                }
             }
         }
 
@@ -1125,12 +1183,12 @@ public class Events implements Listener {
     @EventHandler
     public void onPlayerInteractEntity(PlayerInteractEntityEvent event) {
 
-        System.out.println("111");
+        //System.out.println("111");
         Player player = event.getPlayer();
         LivingEntity entity = (LivingEntity) event.getRightClicked();
         ItemStack itemInHand = player.getInventory().getItemInMainHand();
         if (Utils.hasEnchant(itemInHand, Utils.strangulation_I)) {
-            System.out.println("222");
+            //System.out.println("222");
             freezeEntity(entity);
         } else {
             unfreezeEntity(entity);
@@ -1138,7 +1196,7 @@ public class Events implements Listener {
     }
 
     public void freezeEntity(LivingEntity entity) {
-        System.out.println("333");
+        //System.out.println("333");
 
         entity.setGravity(false);
         entity.setAI(false);
